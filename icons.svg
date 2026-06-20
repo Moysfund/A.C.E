@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+    <rect width="512" height="512" rx="80" fill="#0b0f1a"/>
+    <rect x="50" y="50" width="412" height="412" rx="60" fill="none" stroke="#00d4ff" stroke-width="8"/>
+    <text x="256" y="280" font-family="Arial, sans-serif" font-size="120" font-weight="900" text-anchor="middle" fill="#00d4ff">LASBCA</text>
+    <text x="256" y="350" font-family="Arial, sans-serif" font-size="36" font-weight="600" text-anchor="middle" fill="#889bc2">A.C.E.</text>
+</svg>
