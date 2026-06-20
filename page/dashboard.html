@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Dashboard - LASBCA A.C.E.</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        body {
+            background: #0b0f1a;
+            color: #eef2f8;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .lasbca-badge {
+            background: #0b1a2b;
+            border: 2px solid #00d4ff;
+            color: #00d4ff;
+            padding: 3px 14px;
+            border-radius: 4px;
+            font-weight: 800;
+            font-size: 0.7rem;
+            letter-spacing: 1.5px;
+            display: inline-block;
+            text-transform: uppercase;
+        }
+
+        .dashboard-container {
+            padding: 90px 20px 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        .page-header h1 i {
+            color: #00d4ff;
+            margin-right: 12px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 1.2rem 1.5rem;
+            transition: 0.3s ease;
+            text-align: center;
+        }
+
+        .stat-card:hover {
+            background: rgba(0, 212, 255, 0.03);
+            border-color: rgba(0, 212, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #00d4ff;
+            display: block;
+        }
+
+        .stat-card .label {
+            font-size: 0.7rem;
+            color: #5a6f92;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.2rem;
+        }
+
+        .stat-card .change {
+            font-size: 0.65rem;
+            display: inline-block;
+            padding: 0.1rem 0.8rem;
+            border-radius: 20px;
+            margin-top: 0.3rem;
+        }
+
+        .change.up {
+            background: rgba(76, 175, 80, 0.12);
+            color: #4caf50;
+        }
+
+        .change.down {
+            background: rgba(255, 107, 107, 0.12);
+            color: #ff6b6b;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 700px) {
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .section-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .section-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #889bc2;
+        }
+
+        .recent-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            font-size: 0.85rem;
+        }
+
+        .recent-item:last-child {
+            border-bottom: none;
+        }
+
+        .recent-item .badge-status {
+            padding: 0.1rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            font-weight: 600;
+        }
+
+        .badge-status.approved {
+            background: rgba(76, 175, 80, 0.12);
+            color: #4caf50;
+        }
+        .badge-status.pending {
+            background: rgba(255, 193, 7, 0.12);
+            color: #ffc107;
+        }
+        .badge-status.contravention {
+            background: rgba(255, 107, 107, 0.12);
+            color: #ff6b6b;
+        }
+
+        .quick-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .quick-actions button {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 0.7rem 1rem;
+            border-radius: 12px;
+            color: #eef2f8;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+        }
+
+        .quick-actions button:hover {
+            background: rgba(0, 212, 255, 0.04);
+            border-color: rgba(0, 212, 255, 0.1);
+        }
+
+        .quick-actions button i {
+            color: #00d4ff;
+            width: 24px;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .team-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 0.8rem;
+            text-align: center;
+            font-size: 0.75rem;
+        }
+
+        .team-card .name {
+            font-weight: 700;
+            color: #00d4ff;
+        }
+
+        .team-card .reports {
+            color: #5a6f92;
+            font-size: 0.7rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00d4ff, #0088cc);
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 40px;
+            color: #0b0f1a;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 16px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            color: #eef2f8;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(11, 15, 26, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 212, 255, 0.15);
+            padding: 0.6rem 2rem;
+            border-radius: 40px;
+            color: #eef2f8;
+            font-weight: 600;
+            z-index: 2000;
+            display: none;
+            font-size: 0.8rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .toast.show {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation -->
+    <div class="top-bar" style="position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:0.8rem 2rem;background:rgba(11,15,26,0.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(0,212,255,0.08);">
+        <div class="logo" style="display:flex;align-items:center;gap:12px;font-weight:800;font-size:1.2rem;color:#f5f8ff;">
+            <span class="lasbca-badge">LASBCA</span>
+            <span style="font-size:1.4rem;">⚡</span>
+            <span style="font-weight:800;">A.C.E.</span>
+            <span style="font-weight:400;font-size:0.65rem;color:#889bc2;letter-spacing:1px;display:none;">Automated Compliance Engine</span>
+        </div>
+        <div class="top-actions" style="display:flex;gap:1rem;align-items:center;">
+            <span class="badge" style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.12);padding:0.3rem 1rem;border-radius:40px;font-size:0.65rem;font-weight:600;color:#00d4ff;display:none;">EPPPS Live</span>
+            <div class="user" style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.03);padding:0.2rem 1rem 0.2rem 0.6rem;border-radius:40px;border:1px solid rgba(255,255,255,0.04);font-size:0.75rem;">
+                <i class="fas fa-user-cog" style="color:#889bc2;"></i>
+                <span>Team A</span>
+            </div>
+            <button onclick="window.location.href='../index.html'" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:0.3rem 0.8rem;border-radius:40px;color:#889bc2;cursor:pointer;font-family:'Inter',sans-serif;font-size:0.7rem;">
+                <i class="fas fa-home"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-container">
+
+        <div class="page-header">
+            <h1><i class="fas fa-chart-pie"></i> Dashboard</h1>
+            <div style="display:flex;gap:0.8rem;flex-wrap:wrap;">
+                <button onclick="window.location.href='stage-report.html'" class="btn-primary"><i class="fas fa-plus"></i> New Report</button>
+                <button onclick="window.location.href='reports.html'" class="btn-secondary"><i class="fas fa-file-alt"></i> All Reports</button>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="number" id="stageCount">0</span>
+                <div class="label">Stage Reports</div>
+                <span class="change up"><i class="fas fa-arrow-up"></i> This month</span>
+            </div>
+            <div class="stat-card">
+                <span class="number" id="contraCount">0</span>
+                <div class="label">Contraventions</div>
+                <span class="change down"><i class="fas fa-arrow-up"></i> Active</span>
+            </div>
+            <div class="stat-card">
+                <span class="number" id="pcaCount">0</span>
+                <div class="label">PCA Audits</div>
+                <span class="change up"><i class="fas fa-check-circle"></i> Completed</span>
+            </div>
+            <div class="stat-card">
+                <span class="number" id="projectCount">0</span>
+                <div class="label">Active Projects</div>
+                <span class="change up"><i class="fas fa-arrow-up"></i> Ongoing</span>
+            </div>
+        </div>
+
+        <!-- Two Column Layout -->
+        <div class="two-col">
+            <!-- Left: Recent Reports -->
+            <div class="section-card">
+                <h3>📋 Recent Reports</h3>
+                <div id="recentList">
+                    <div style="text-align:center;color:#5a6f92;padding:2rem 0;font-size:0.9rem;">
+                        No reports yet. Create your first report!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Quick Actions -->
+            <div class="section-card">
+                <h3>⚡ Quick Actions</h3>
+                <div class="quick-actions">
+                    <button onclick="window.location.href='stage-report.html'"><i class="fas fa-camera"></i> Stage Report</button>
+                    <button onclick="window.location.href='contravention.html'"><i class="fas fa-exclamation-triangle"></i> Contravention</button>
+                    <button onclick="window.location.href='pca-audit.html'"><i class="fas fa-clipboard-check"></i> PCA Audit</button>
+                    <button onclick="window.location.href='reports.html'"><i class="fas fa-file-alt"></i> View All Reports</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teams -->
+        <div class="section-card" style="margin-top:1.5rem;">
+            <h3>👥 Teams</h3>
+            <div class="team-grid" id="teamGrid">
+                <!-- Rendered by JS -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+    <script src="../storage.js"></script>
+    <script>
+        function loadDashboard() {
+            const stageReports = getStageReports();
+            const contraventions = getContraventions();
+            const pcaAudits = getPCAAudits();
+            const projects = getProjects();
+
+            // Update counts
+            document.getElementById('stageCount').textContent = stageReports.length;
+            document.getElementById('contraCount').textContent = contraventions.length;
+            document.getElementById('pcaCount').textContent = pcaAudits.length;
+            document.getElementById('projectCount').textContent = projects.length || 4;
+
+            // Recent Reports
+            const allReports = [
+                ...stageReports.map(r => ({ ...r, type: 'Stage', status: 'approved' })),
+                ...contraventions.map(r => ({ ...r, type: 'Contravention', status: 'contravention' })),
+                ...pcaAudits.map(r => ({ ...r, type: 'PCA', status: 'approved' }))
+            ];
+            allReports.sort((a, b) => new Date(b.submittedAt || b.reportDate) - new Date(a.submittedAt || a.reportDate));
+
+            const recentList = document.getElementById('recentList');
+            if (allReports.length === 0) {
+                recentList.innerHTML = `<div style="text-align:center;color:#5a6f92;padding:2rem 0;font-size:0.9rem;">No reports yet. Create your first report!</div>`;
+            } else {
+                const recent = allReports.slice(0, 5);
+                recentList.innerHTML = recent.map(r => `
+                    <div class="recent-item">
+                        <div>
+                            <strong>${r.project || 'N/A'}</strong>
+                            <span class="badge-status ${r.status}">${r.status || 'Submitted'}</span>
+                            <span style="color:#5a6f92;font-size:0.7rem;margin-left:6px;">${r.type}</span>
+                        </div>
+                        <span style="color:#5a6f92;font-size:0.7rem;">${r.reportDate || r.date || 'N/A'}</span>
+                    </div>
+                `).join('');
+            }
+
+            // Teams
+            const teams = getTeams();
+            const teamGrid = document.getElementById('teamGrid');
+            teamGrid.innerHTML = teams.map(t => `
+                <div class="team-card">
+                    <div class="name">${t.name}</div>
+                    <div class="reports">${t.reports || 0} reports</div>
+                    <div style="font-size:0.6rem;color:#5a6f92;">Lead: ${t.lead || 'N/A'}</div>
+                </div>
+            `).join('');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', loadDashboard);
+        window.showToast = showToast;
+    </script>
+</body>
+</html>
