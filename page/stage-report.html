@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Stage Report - LASBCA A.C.E.</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        .photo-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .photo-preview img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            padding: 0 1rem;
+        }
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            position: relative;
+        }
+        .step .circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: #5a6f92;
+            transition: 0.3s;
+        }
+        .step.active .circle {
+            background: rgba(0, 212, 255, 0.15);
+            border-color: #00d4ff;
+            color: #00d4ff;
+        }
+        .step.completed .circle {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: #4caf50;
+            color: #4caf50;
+        }
+        .step .label {
+            font-size: 0.6rem;
+            color: #5a6f92;
+            margin-top: 0.3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .step .line {
+            position: absolute;
+            top: 18px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.05);
+            z-index: -1;
+        }
+        .step:last-child .line {
+            display: none;
+        }
+        .step.active .line {
+            background: rgba(0, 212, 255, 0.3);
+        }
+        .step.completed .line {
+            background: rgba(76, 175, 80, 0.3);
+        }
+        .submit-success {
+            display: none;
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+        .submit-success.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        .submit-success i {
+            font-size: 4rem;
+            color: #4caf50;
+        }
+        .submit-success h2 {
+            margin-top: 1rem;
+        }
+        .form-section-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #00d4ff;
+            margin: 1.5rem 0 1rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+        }
+        .form-section-title i {
+            margin-right: 8px;
+        }
+        .signature-line {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.3rem;
+            margin-top: 0.3rem;
+            min-height: 30px;
+        }
+        .signature-line input {
+            background: transparent;
+            border: none;
+            width: 100%;
+            color: #eef2f8;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            padding: 0.2rem 0;
+        }
+        .signature-line input:focus {
+            outline: none;
+            border-bottom: 1px solid #00d4ff;
+        }
+        .lasbca-badge {
+            background: #0b1a2b;
+            border: 2px solid #00d4ff;
+            color: #00d4ff;
+            padding: 3px 14px;
+            border-radius: 4px;
+            font-weight: 800;
+            font-size: 0.7rem;
+            letter-spacing: 1.5px;
+            display: inline-block;
+            text-transform: uppercase;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        body {
+            background: #0b0f1a;
+            color: #eef2f8;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        .page-container {
+            padding: 90px 20px 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .page-header h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+        .page-header h1 i {
+            color: #00d4ff;
+            margin-right: 10px;
+        }
+        .btn-back {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            color: #eef2f8;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .btn-next {
+            background: linear-gradient(135deg, #00d4ff, #0088cc);
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #0b0f1a;
+            cursor: pointer;
+            transition: 0.25s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-next:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 16px rgba(0, 212, 255, 0.3);
+        }
+        .btn-submit {
+            background: linear-gradient(135deg, #00d4ff, #0088cc);
+            border: none;
+            padding: 1rem 2.8rem;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #0b0f1a;
+            cursor: pointer;
+            transition: 0.25s ease;
+            box-shadow: 0 8px 24px rgba(0, 212, 255, 0.2);
+            font-family: 'Inter', sans-serif;
+            width: 100%;
+        }
+        .btn-submit:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 32px rgba(0, 212, 255, 0.3);
+        }
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+            color: #b9c8e6;
+        }
+        .form-group label .required {
+            color: #ff6b6b;
+            margin-left: 3px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            color: #eef2f8;
+            font-size: 0.95rem;
+            font-family: 'Inter', sans-serif;
+            transition: 0.2s;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.03);
+        }
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        .file-upload {
+            border: 2px dashed rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #5a6f92;
+        }
+        .file-upload:hover {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.02);
+        }
+        .file-upload i {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+        .file-upload small {
+            font-size: 0.7rem;
+            color: #3a4f6a;
+        }
+        .ai-response {
+            background: rgba(0, 212, 255, 0.03);
+            border: 1px solid rgba(0, 212, 255, 0.08);
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .ai-response h4 {
+            color: #00d4ff;
+            margin-bottom: 0.3rem;
+            font-size: 0.9rem;
+        }
+        .ai-response .observation {
+            padding: 0.3rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            font-size: 0.85rem;
+        }
+        .ai-response .observation:last-child {
+            border-bottom: none;
+        }
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(11, 15, 26, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 212, 255, 0.15);
+            padding: 0.6rem 2rem;
+            border-radius: 40px;
+            color: #eef2f8;
+            font-weight: 600;
+            z-index: 2000;
+            display: none;
+            font-size: 0.8rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+        .toast.show {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.3rem 1rem;
+            font-size: 0.85rem;
+        }
+        .summary-grid .label {
+            color: #5a6f92;
+        }
+        .summary-grid .value {
+            font-weight: 600;
+        }
+        @media (max-width: 500px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+                gap: 0.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation -->
+    <div class="top-bar" style="position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:0.6rem 1.5rem;background:rgba(11,15,26,0.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(0,212,255,0.08);">
+        <div class="logo" style="display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.1rem;color:#f5f8ff;">
+            <span class="lasbca-badge">LASBCA</span>
+            <span style="font-size:1.2rem;">⚡</span>
+            <span style="font-weight:800;">A.C.E.</span>
+            <span style="font-weight:400;font-size:0.6rem;color:#889bc2;letter-spacing:1px;display:none;">Stage Report</span>
+        </div>
+        <div class="top-actions" style="display:flex;gap:0.8rem;align-items:center;">
+            <span class="badge" style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.12);padding:0.2rem 0.8rem;border-radius:40px;font-size:0.6rem;font-weight:600;color:#00d4ff;display:none;">EPPPS Live</span>
+            <div class="user" style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.03);padding:0.2rem 0.8rem 0.2rem 0.5rem;border-radius:40px;border:1px solid rgba(255,255,255,0.04);font-size:0.7rem;">
+                <i class="fas fa-user-cog" style="color:#889bc2;"></i>
+                <span>Team A</span>
+            </div>
+            <button onclick="window.location.href='dashboard.html'" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:0.2rem 0.8rem;border-radius:40px;color:#889bc2;cursor:pointer;font-family:'Inter',sans-serif;font-size:0.65rem;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="page-container">
+
+        <div class="page-header">
+            <h1><i class="fas fa-camera"></i> Stage Report</h1>
+            <button onclick="window.location.href='dashboard.html'" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+        </div>
+
+        <!-- Steps -->
+        <div class="step-indicator">
+            <div class="step active" id="step1">
+                <div class="circle">1</div>
+                <div class="label">Details</div>
+                <div class="line"></div>
+            </div>
+            <div class="step" id="step2">
+                <div class="circle">2</div>
+                <div class="label">Photos</div>
+                <div class="line"></div>
+            </div>
+            <div class="step" id="step3">
+                <div class="circle">3</div>
+                <div class="label">Review</div>
+                <div class="line"></div>
+            </div>
+            <div class="step" id="step4">
+                <div class="circle">4</div>
+                <div class="label">Submit</div>
+            </div>
+        </div>
+
+        <form id="stageReportForm">
+
+            <!-- STEP 1 -->
+            <div id="step1Content">
+                <!-- Header Information -->
+                <div class="form-section-title"><i class="fas fa-file-alt"></i> Report Information</div>
+
+                <div class="form-group">
+                    <label>File Number <span class="required">*</span></label>
+                    <input type="text" id="fileNumber" placeholder="e.g., LASBCA/SR/2026/045" required />
+                </div>
+
+                <div class="form-group">
+                    <label>LASPPA Permit Number <span style="color:#5a6f92;font-weight:400;">(if applicable)</span></label>
+                    <input type="text" id="permitNumber" placeholder="e.g., LASPPA-2026-078" />
+                </div>
+
+                <div class="form-group">
+                    <label>Developer Name <span class="required">*</span></label>
+                    <input type="text" id="developerName" placeholder="e.g., Eko Development Ltd" required />
+                </div>
+
+                <!-- Project Information -->
+                <div class="form-section-title"><i class="fas fa-building"></i> Project Information</div>
+
+                <div class="form-group">
+                    <label>Project / Building Name <span class="required">*</span></label>
+                    <input type="text" id="projectName" placeholder="e.g., Eko Tower Phase 2" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Site Address <span class="required">*</span></label>
+                    <input type="text" id="siteAddress" placeholder="e.g., 12 Allen Avenue, Ikeja, Lagos" required />
+                </div>
+
+                <!-- Stage Information -->
+                <div class="form-section-title"><i class="fas fa-layer-group"></i> Stage Information</div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Stage Number <span class="required">*</span></label>
+                        <input type="text" id="stageNumber" placeholder="e.g., Stage 3" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Stage Type <span class="required">*</span></label>
+                        <select id="stageType" required>
+                            <option value="">Select stage</option>
+                            <option>Foundation</option>
+                            <option>Piling</option>
+                            <option>Ground Floor Columns</option>
+                            <option>Ground Floor Slab</option>
+                            <option>First Floor Columns</option>
+                            <option>First Floor Slab</option>
+                            <option>Second Floor Columns</option>
+                            <option>Second Floor Slab</option>
+                            <option>Third Floor Columns</option>
+                            <option>Third Floor Slab</option>
+                            <option>Fourth Floor Columns</option>
+                            <option>Fourth Floor Slab</option>
+                            <option>Fifth Floor Columns</option>
+                            <option>Fifth Floor Slab</option>
+                            <option>Sixth Floor Columns</option>
+                            <option>Sixth Floor Slab</option>
+                            <option>Seventh Floor Columns</option>
+                            <option>Seventh Floor Slab</option>
+                            <option>Roof Stage</option>
+                            <option>Blockwork</option>
+                            <option>Lintels</option>
+                            <option>Plastering</option>
+                            <option>Mechanical, Electrical & Plumbing (MEP)</option>
+                            <option>Fixtures & Fittings</option>
+                            <option>Finishing Stage</option>
+                            <option>Final Inspection & Approval</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Team <span class="required">*</span></label>
+                        <select id="teamSelect" required>
+                            <option value="">Select team</option>
+                            <option>Team A</option>
+                            <option>Team B</option>
+                            <option>Team C</option>
+                            <option>Special Team</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Team Head <span class="required">*</span></label>
+                        <input type="text" id="teamHead" placeholder="e.g., Engr. Adebayo" required />
+                    </div>
+                </div>
+
+                <!-- Dates -->
+                <div class="form-section-title"><i class="fas fa-calendar-alt"></i> Dates</div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Date of Capturing <span class="required">*</span></label>
+                        <input type="date" id="capturingDate" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Date of Report <span class="required">*</span></label>
+                        <input type="date" id="reportDate" required />
+                    </div>
+                </div>
+
+                <!-- Observations -->
+                <div class="form-section-title"><i class="fas fa-clipboard-list"></i> Observations</div>
+
+                <div class="form-group">
+                    <label>Site Observations <span class="required">*</span></label>
+                    <textarea id="observations" placeholder="Describe what you observed on site..." required></textarea>
+                </div>
+
+                <!-- Instructions -->
+                <div class="form-section-title"><i class="fas fa-tasks"></i> Instructions for Developer</div>
+
+                <div class="form-group">
+                    <label>Next Steps / Instructions <span class="required">*</span></label>
+                    <textarea id="instructions" placeholder="e.g., Proceed to Fourth Floor Columns. Ensure rebar spacing is corrected..." required></textarea>
+                </div>
+
+                <!-- Signature -->
+                <div class="form-section-title"><i class="fas fa-pen"></i> Signature</div>
+
+                <div class="form-group">
+                    <label>Team Head Signature</label>
+                    <div class="signature-line">
+                        <input type="text" id="signature" placeholder="Type your full name as signature..." />
+                    </div>
+                </div>
+
+                <button type="button" class="btn-next" onclick="nextStep(2)" style="width:100%;">
+                    Next: Add Photos <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- STEP 2 -->
+            <div id="step2Content" style="display:none;">
+                <div class="form-group">
+                    <label>Upload Photos <span class="required">*</span></label>
+                    <div class="file-upload" onclick="document.getElementById('photoInput').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        Tap to upload photos<br />
+                        <small>JPEG, PNG (max 10 images)</small>
+                        <input type="file" id="photoInput" multiple accept="image/*" style="display:none;" onchange="handlePhotos(event)" />
+                    </div>
+                    <div class="photo-preview" id="photoPreview"></div>
+                </div>
+                <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+                    <button type="button" class="btn-back" onclick="prevStep(1)" style="flex:1;">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                    <button type="button" class="btn-next" onclick="nextStep(3)" style="flex:2;">
+                        Review & Submit <i class="fas fa-check"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 3 -->
+            <div id="step3Content" style="display:none;">
+                <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;">
+                    <h4 style="margin-bottom:1rem;">📋 Report Summary</h4>
+                    <div class="summary-grid">
+                        <span class="label">File Number:</span>
+                        <span class="value" id="summaryFileNo">-</span>
+                        <span class="label">LASPPA Permit:</span>
+                        <span class="value" id="summaryPermit">-</span>
+                        <span class="label">Developer:</span>
+                        <span class="value" id="summaryDeveloper">-</span>
+                        <span class="label">Project:</span>
+                        <span class="value" id="summaryProject">-</span>
+                        <span class="label">Address:</span>
+                        <span class="value" id="summaryAddress">-</span>
+                        <span class="label">Stage:</span>
+                        <span class="value" id="summaryStage">-</span>
+                        <span class="label">Team:</span>
+                        <span class="value" id="summaryTeam">-</span>
+                        <span class="label">Team Head:</span>
+                        <span class="value" id="summaryTeamHead">-</span>
+                        <span class="label">Date of Capturing:</span>
+                        <span class="value" id="summaryCapturing">-</span>
+                        <span class="label">Date of Report:</span>
+                        <span class="value" id="summaryReport">-</span>
+                        <span class="label">Photos:</span>
+                        <span class="value" id="summaryPhotos">-</span>
+                    </div>
+                </div>
+
+                <div style="background:rgba(0,212,255,0.03);border:1px solid rgba(0,212,255,0.08);border-radius:12px;padding:1rem;margin-bottom:1.5rem;">
+                    <h4 style="color:#00d4ff;font-size:0.9rem;">📝 Observations</h4>
+                    <p style="font-size:0.85rem;color:#b9c8e6;" id="summaryObservations">-</p>
+                </div>
+
+                <div style="background:rgba(245,176,66,0.03);border:1px solid rgba(245,176,66,0.08);border-radius:12px;padding:1rem;margin-bottom:1.5rem;">
+                    <h4 style="color:#f5b042;font-size:0.9rem;">📋 Instructions for Developer</h4>
+                    <p style="font-size:0.85rem;color:#b9c8e6;" id="summaryInstructions">-</p>
+                </div>
+
+                <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+                    <button type="button" class="btn-back" onclick="prevStep(2)" style="flex:1;">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                    <button type="submit" class="btn-submit" style="flex:2;">
+                        <i class="fas fa-paper-plane"></i> Submit Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Success State -->
+            <div class="submit-success" id="successState">
+                <i class="fas fa-check-circle"></i>
+                <h2>Report Submitted!</h2>
+                <p style="color:#889bc2;">Your report has been saved. A PDF will be generated for download.</p>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+    <script src="../storage.js"></script>
+    <script src="../pdf-generator.js"></script>
+
+    <script>
+        let currentStep = 1;
+        let uploadedPhotos = [];
+        let photoFiles = [];
+
+        // Set default dates
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('capturingDate').value = today;
+            document.getElementById('reportDate').value = today;
+        });
+
+        // Photo handling
+        function handlePhotos(event) {
+            const files = event.target.files;
+            for (let file of files) {
+                if (uploadedPhotos.length >= 10) break;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedPhotos.push(e.target.result);
+                    photoFiles.push(file);
+                    renderPhotos();
+                };
+                reader.readAsDataURL(file);
+            }
+            event.target.value = '';
+        }
+
+        function renderPhotos() {
+            const container = document.getElementById('photoPreview');
+            container.innerHTML = uploadedPhotos.map((src, index) => `
+                <div style="position:relative;display:inline-block;">
+                    <img src="${src}" alt="Upload ${index+1}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,0.1);" />
+                    <button onclick="removePhoto(${index})" style="position:absolute;top:-8px;right:-8px;background:rgba(255,70,70,0.9);border:none;color:white;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;">
+                        ✕
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function removePhoto(index) {
+            uploadedPhotos.splice(index, 1);
+            photoFiles.splice(index, 1);
+            renderPhotos();
+        }
+
+        // Step navigation
+        function nextStep(step) {
+            if (step === 2) {
+                const fields = ['fileNumber', 'developerName', 'projectName', 'siteAddress', 'stageNumber', 'stageType',
+                    'teamSelect', 'teamHead', 'capturingDate', 'reportDate', 'observations', 'instructions'
+                ];
+                let valid = true;
+                fields.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (!el.value.trim()) {
+                        el.style.borderColor = '#ff6b6b';
+                        valid = false;
+                    } else {
+                        el.style.borderColor = '';
+                    }
+                });
+                if (!valid) {
+                    showToast('⚠️ Please fill in all required fields');
+                    return;
+                }
+            }
+            if (step === 3 && uploadedPhotos.length === 0) {
+                showToast('⚠️ Please upload at least one photo');
+                return;
+            }
+            if (step === 3) {
+                document.getElementById('summaryFileNo').textContent = document.getElementById('fileNumber').value;
+                document.getElementById('summaryPermit').textContent = document.getElementById('permitNumber').value || 'N/A (if applicable)';
+                document.getElementById('summaryDeveloper').textContent = document.getElementById('developerName').value;
+                document.getElementById('summaryProject').textContent = document.getElementById('projectName').value;
+                document.getElementById('summaryAddress').textContent = document.getElementById('siteAddress').value;
+                document.getElementById('summaryStage').textContent = document.getElementById('stageNumber').value + ' (' +
+                    document.getElementById('stageType').value + ')';
+                document.getElementById('summaryTeam').textContent = document.getElementById('teamSelect').value;
+                document.getElementById('summaryTeamHead').textContent = document.getElementById('teamHead').value;
+                document.getElementById('summaryCapturing').textContent = document.getElementById('capturingDate').value;
+                document.getElementById('summaryReport').textContent = document.getElementById('reportDate').value;
+                document.getElementById('summaryPhotos').textContent = uploadedPhotos.length + ' photos';
+                document.getElementById('summaryObservations').textContent = document.getElementById('observations').value;
+                document.getElementById('summaryInstructions').textContent = document.getElementById('instructions').value;
+            }
+
+            document.getElementById('step1Content').style.display = 'none';
+            document.getElementById('step2Content').style.display = 'none';
+            document.getElementById('step3Content').style.display = 'none';
+
+            document.getElementById('step' + step + 'Content').style.display = 'block';
+
+            for (let i = 1; i <= 4; i++) {
+                const stepEl = document.getElementById('step' + i);
+                stepEl.classList.remove('active', 'completed');
+                if (i < step) stepEl.classList.add('completed');
+                if (i === step) stepEl.classList.add('active');
+            }
+
+            currentStep = step;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function prevStep(step) {
+            nextStep(step);
+        }
+
+        // ===== SUBMIT HANDLER =====
+        document.getElementById('stageReportForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const data = {
+                fileNo: document.getElementById('fileNumber').value,
+                lasppaPermit: document.getElementById('permitNumber').value || 'N/A (if applicable)',
+                developer: document.getElementById('developerName').value,
+                project: document.getElementById('projectName').value,
+                address: document.getElementById('siteAddress').value,
+                stageNumber: document.getElementById('stageNumber').value,
+                stageType: document.getElementById('stageType').value,
+                team: document.getElementById('teamSelect').value,
+                teamHead: document.getElementById('teamHead').value,
+                capturingDate: document.getElementById('capturingDate').value,
+                reportDate: document.getElementById('reportDate').value,
+                observations: document.getElementById('observations').value,
+                instructions: document.getElementById('instructions').value,
+                signature: document.getElementById('signature').value || 'Signed',
+                photos: uploadedPhotos.length,
+                submittedAt: new Date().toISOString()
+            };
+
+            // Save to Local Storage
+            saveStageReport(data);
+
+            showToast('⏳ Generating report...');
+
+            // Generate PDF with popup
+            generateStageReportPDF(data).then(() => {
+                document.getElementById('step1Content').style.display = 'none';
+                document.getElementById('step2Content').style.display = 'none';
+                document.getElementById('step3Content').style.display = 'none';
+                document.getElementById('successState').classList.add('show');
+                showToast('✅ Report submitted successfully!');
+            }).catch(err => {
+                showToast('❌ Error: ' + err.message);
+            });
+        });
+
+        // Toast function
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        window.showToast = showToast;
+    </script>
+</body>
+</html>
