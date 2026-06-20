@@ -1,4 +1,4 @@
-// script.js - 4D Interactive Construction Scene
+// script.js - 4D Interactive Construction Scene with LASBCA Staff
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -8,12 +8,12 @@ import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer
 const container = document.getElementById('canvas-container');
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x0b0f1a);
-scene.fog = new THREE.Fog(0x0b0f1a, 30, 60);
+scene.fog = new THREE.Fog(0x0b0f1a, 35, 65);
 
 // ===== CAMERA =====
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(25, 15, 30);
-camera.lookAt(0, 0, 0);
+camera.position.set(25, 14, 30);
+camera.lookAt(0, 4, 0);
 
 // ===== RENDERERS =====
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -38,17 +38,17 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.08;
 controls.autoRotate = true;
-controls.autoRotateSpeed = 0.8;
+controls.autoRotateSpeed = 0.7;
 controls.target.set(0, 5, 0);
 controls.maxPolarAngle = Math.PI / 2.1;
 controls.minDistance = 10;
-controls.maxDistance = 50;
+controls.maxDistance = 55;
 
 // ===== LIGHTS =====
 const ambientLight = new THREE.AmbientLight(0x404066, 0.5);
 scene.add(ambientLight);
 
-const mainLight = new THREE.DirectionalLight(0xffeedd, 2.0);
+const mainLight = new THREE.DirectionalLight(0xffeedd, 2.2);
 mainLight.position.set(15, 30, 15);
 mainLight.castShadow = true;
 mainLight.shadow.mapSize.width = 2048;
@@ -61,11 +61,11 @@ mainLight.shadow.camera.top = 30;
 mainLight.shadow.camera.bottom = -30;
 scene.add(mainLight);
 
-const fillLight = new THREE.DirectionalLight(0x4488ff, 0.4);
+const fillLight = new THREE.DirectionalLight(0x4488ff, 0.3);
 fillLight.position.set(-10, 10, -15);
 scene.add(fillLight);
 
-const rimLight = new THREE.DirectionalLight(0xffaa55, 0.5);
+const rimLight = new THREE.DirectionalLight(0xffaa55, 0.4);
 rimLight.position.set(-5, 5, -20);
 scene.add(rimLight);
 
@@ -111,12 +111,9 @@ const slabMat = new THREE.MeshStandardMaterial({
 });
 
 const columnPositions = [
-    [-5.5, -3.5],
-    [-5.5, 3.5],
-    [0, -3.5],
-    [0, 3.5],
-    [5.5, -3.5],
-    [5.5, 3.5]
+    [-5.5, -3.5], [-5.5, 3.5],
+    [0, -3.5], [0, 3.5],
+    [5.5, -3.5], [5.5, 3.5]
 ];
 
 const floorHeights = [1.2, 2.8, 4.4, 6.0, 7.6];
@@ -227,84 +224,123 @@ craneGroup.add(cable);
 
 buildingGroup.add(craneGroup);
 
-// ===== LASBCA STAFF (Animated People - Simple Geometry) =====
+// ===== LASBCA STAFF & WORKERS =====
 const staffGroup = new THREE.Group();
 
-function createPerson(color, labelText, x, z) {
+function createPerson(bodyColor, headColor, hatColor, vestColor, labelText, x, z, hasClipboard = false, isLASBCA = false) {
     const group = new THREE.Group();
 
     // Body (torso)
-    const bodyMat = new THREE.MeshStandardMaterial({ color: color, roughness: 0.6 });
-    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.35, 0.7, 6), bodyMat);
+    const bodyMat = new THREE.MeshStandardMaterial({ color: bodyColor, roughness: 0.6 });
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.33, 0.65, 6), bodyMat);
     body.position.y = 0.8;
     body.castShadow = true;
     group.add(body);
 
     // Head
-    const headMat = new THREE.MeshStandardMaterial({ color: 0xd4a574, roughness: 0.8 });
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.2, 6, 6), headMat);
+    const headMat = new THREE.MeshStandardMaterial({ color: headColor, roughness: 0.8 });
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.18, 6, 6), headMat);
     head.position.y = 1.3;
     group.add(head);
 
     // Hard hat
-    const hatMat = new THREE.MeshStandardMaterial({ color: 0xffaa00, roughness: 0.3 });
-    const hat = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.22, 0.15, 6), hatMat);
+    const hatMat = new THREE.MeshStandardMaterial({ color: hatColor, roughness: 0.3 });
+    const hat = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.20, 0.14, 6), hatMat);
     hat.position.y = 1.45;
     group.add(hat);
 
     // Legs
     const legMat = new THREE.MeshStandardMaterial({ color: 0x2a3a4a, roughness: 0.8 });
-    const leg1 = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 0.4, 4), legMat);
-    leg1.position.set(-0.1, 0.2, 0);
+    const leg1 = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 0.35, 4), legMat);
+    leg1.position.set(-0.08, 0.18, 0);
     group.add(leg1);
-    const leg2 = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 0.4, 4), legMat);
-    leg2.position.set(0.1, 0.2, 0);
+    const leg2 = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 0.35, 4), legMat);
+    leg2.position.set(0.08, 0.18, 0);
     group.add(leg2);
 
-    // LASBCA Vest (just a colored overlay)
-    const vestMat = new THREE.MeshStandardMaterial({ color: 0x00d4ff, emissive: 0x00d4ff, emissiveIntensity: 0.05 });
-    const vest = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.37, 0.5, 6), vestMat);
-    vest.position.y = 0.85;
-    group.add(vest);
+    // LASBCA Vest (if LASBCA staff)
+    if (isLASBCA) {
+        const vestMat = new THREE.MeshStandardMaterial({
+            color: vestColor || 0x00d4ff,
+            emissive: 0x00d4ff,
+            emissiveIntensity: 0.04,
+            roughness: 0.4
+        });
+        const vest = new THREE.Mesh(new THREE.CylinderGeometry(0.30, 0.35, 0.45, 6), vestMat);
+        vest.position.y = 0.85;
+        group.add(vest);
+    }
 
     // Clipboard (for LASBCA staff)
-    if (labelText.includes('LASBCA')) {
+    if (hasClipboard) {
         const clipMat = new THREE.MeshStandardMaterial({ color: 0x8a7a4a });
-        const clip = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.25, 0.02), clipMat);
-        clip.position.set(0.4, 0.75, 0);
+        const clip = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.22, 0.02), clipMat);
+        clip.position.set(0.35, 0.7, 0);
         group.add(clip);
+        // Paper
+        const paperMat = new THREE.MeshStandardMaterial({ color: 0xeef2f8 });
+        const paper = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.18, 0.005), paperMat);
+        paper.position.set(0.35, 0.7, 0.015);
+        group.add(paper);
     }
+
+    // Arms (simple cylinders)
+    const armMat = new THREE.MeshStandardMaterial({ color: bodyColor, roughness: 0.6 });
+    const arm1 = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.05, 0.35, 4), armMat);
+    arm1.position.set(-0.35, 0.75, 0);
+    arm1.rotation.z = 0.2;
+    group.add(arm1);
+    const arm2 = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.05, 0.35, 4), armMat);
+    arm2.position.set(0.35, 0.75, 0);
+    arm2.rotation.z = -0.2;
+    group.add(arm2);
 
     group.position.set(x, 0, z);
 
-    // Random rotation to face different directions
+    // Random rotation
     group.rotation.y = Math.random() * Math.PI * 2;
+
+    // Store for animation
+    group.userData = {
+        speed: 0.15 + Math.random() * 0.25,
+        phase: Math.random() * Math.PI * 2,
+        startX: x,
+        startZ: z,
+        range: 0.3 + Math.random() * 0.4,
+        label: labelText,
+        isLASBCA: isLASBCA
+    };
 
     return group;
 }
 
 // Add LASBCA Staff
 const staffPositions = [
-    { x: -2, z: 2, color: 0x2a5a7a, label: 'LASBCA Staff' },
-    { x: 3, z: -3, color: 0x2a5a7a, label: 'LASBCA Staff' },
-    { x: -4, z: -2, color: 0x3a6a4a, label: 'Worker' },
-    { x: 0, z: -4, color: 0x3a6a4a, label: 'Worker' },
-    { x: 5, z: 1, color: 0x2a5a7a, label: 'LASBCA Staff' },
-    { x: -3, z: 4, color: 0x3a6a4a, label: 'Worker' },
-    { x: 4, z: -2, color: 0x2a5a7a, label: 'LASBCA Staff' },
-    { x: 1, z: 4.5, color: 0x3a6a4a, label: 'Worker' },
+    { x: -3.5, z: 3.0, color: 0x1a3a5a, label: 'LASBCA Staff' },
+    { x: 4.0, z: -3.5, color: 0x1a3a5a, label: 'LASBCA Staff' },
+    { x: -5.0, z: -2.5, color: 0x2a5a3a, label: 'Worker' },
+    { x: 0.5, z: -4.5, color: 0x2a5a3a, label: 'Worker' },
+    { x: 5.5, z: 2.0, color: 0x1a3a5a, label: 'LASBCA Staff' },
+    { x: -4.5, z: 4.5, color: 0x2a5a3a, label: 'Worker' },
+    { x: 4.5, z: -2.0, color: 0x1a3a5a, label: 'LASBCA Staff' },
+    { x: 1.5, z: 5.0, color: 0x2a5a3a, label: 'Worker' },
+    { x: -2.0, z: -5.0, color: 0x2a5a3a, label: 'Worker' },
+    { x: 6.0, z: 3.5, color: 0x1a3a5a, label: 'LASBCA Staff' },
 ];
 
 staffPositions.forEach((pos) => {
-    const person = createPerson(pos.color, pos.label, pos.x, pos.z);
-    // Store for animation
-    person.userData = {
-        speed: 0.2 + Math.random() * 0.3,
-        phase: Math.random() * Math.PI * 2,
-        startX: pos.x,
-        startZ: pos.z,
-        range: 0.5 + Math.random() * 0.5,
-    };
+    const isLASBCA = pos.label.includes('LASBCA');
+    const person = createPerson(
+        pos.color,
+        0xd4a574, // skin color
+        isLASBCA ? 0x00d4ff : 0xffaa00, // hat color (blue for LASBCA, yellow for workers)
+        isLASBCA ? 0x00d4ff : 0xff6600, // vest color
+        pos.label,
+        pos.x,
+        pos.z,
+        isLASBCA, // clipboard for LASBCA staff
+        isLASBCA // LASBCA vest
+    );
     staffGroup.add(person);
 });
 
@@ -343,15 +379,38 @@ signDiv.style.color = '#00d4ff';
 signDiv.style.fontSize = '11px';
 signDiv.style.fontWeight = '700';
 signDiv.style.fontFamily = 'Inter, sans-serif';
-signDiv.style.background = 'rgba(11, 15, 26, 0.8)';
+signDiv.style.background = 'rgba(11, 15, 26, 0.85)';
 signDiv.style.padding = '6px 20px';
 signDiv.style.borderRadius = '30px';
 signDiv.style.border = '2px solid #00d4ff';
 signDiv.style.backdropFilter = 'blur(4px)';
 signDiv.style.letterSpacing = '2px';
+signDiv.style.boxShadow = '0 4px 20px rgba(0,212,255,0.1)';
 const signLabel = new CSS2DObject(signDiv);
-signLabel.position.set(0, 11, 7);
+signLabel.position.set(0, 11.5, 7);
 labelGroup.add(signLabel);
+
+// Person labels (small floating text above people)
+staffGroup.children.forEach((person, index) => {
+    const label = person.userData.label;
+    if (label) {
+        const div = document.createElement('div');
+        div.textContent = label;
+        div.style.color = label.includes('LASBCA') ? '#00d4ff' : '#889bc2';
+        div.style.fontSize = '7px';
+        div.style.fontWeight = '600';
+        div.style.fontFamily = 'Inter, sans-serif';
+        div.style.background = 'rgba(11, 15, 26, 0.6)';
+        div.style.padding = '1px 8px';
+        div.style.borderRadius = '12px';
+        div.style.border = label.includes('LASBCA') ? '1px solid rgba(0,212,255,0.2)' : '1px solid rgba(255,255,255,0.05)';
+        div.style.backdropFilter = 'blur(4px)';
+        div.style.textShadow = '0 2px 8px rgba(0,0,0,0.8)';
+        const labelObj = new CSS2DObject(div);
+        labelObj.position.set(person.position.x, 2.0, person.position.z);
+        labelGroup.add(labelObj);
+    }
+});
 
 scene.add(labelGroup);
 
@@ -368,7 +427,7 @@ const particleMat = new THREE.PointsMaterial({
     color: 0x00d4ff,
     size: 0.04,
     transparent: true,
-    opacity: 0.15,
+    opacity: 0.12,
     blending: THREE.AdditiveBlending
 });
 const particles = new THREE.Points(particleGeo, particleMat);
@@ -390,18 +449,29 @@ function animate() {
         hookObj.position.y = 8 + Math.sin(time * 0.8) * 0.5;
     }
 
-    // Animate people (simple bobbing)
+    // Animate people (simple bobbing and walking)
     staffGroup.children.forEach((person, i) => {
         const data = person.userData;
         if (data) {
-            // Bob up and down slightly
+            // Bob up and down
             person.position.y = Math.sin(time * data.speed + data.phase) * 0.05;
             // Slight sway
             person.rotation.z = Math.sin(time * data.speed * 0.5 + data.phase) * 0.02;
-            // Walk cycle for legs (simplified - move whole body slightly)
-            person.position.x = data.startX + Math.sin(time * data.speed * 0.5 + data.phase) * data.range * 0.1;
-            person.position.z = data.startZ + Math.cos(time * data.speed * 0.3 + data.phase) * data.range * 0.1;
+            // Walk cycle - move slightly
+            person.position.x = data.startX + Math.sin(time * data.speed * 0.4 + data.phase) * data.range * 0.08;
+            person.position.z = data.startZ + Math.cos(time * data.speed * 0.3 + data.phase) * data.range * 0.08;
         }
+    });
+
+    // Update person labels positions
+    const labelObjects = labelGroup.children;
+    let personIndex = 0;
+    staffGroup.children.forEach((person) => {
+        const labelObj = labelObjects[personIndex + stageLabels.length + 1];
+        if (labelObj) {
+            labelObj.position.set(person.position.x, 2.0, person.position.z);
+        }
+        personIndex++;
     });
 
     // Rotate particles
@@ -439,4 +509,4 @@ renderer.domElement.addEventListener('touchend', () => {
     setTimeout(() => { controls.autoRotate = true; }, 3000);
 });
 
-console.log('🏗️ 4D Construction Scene Loaded!');
+console.log('🏗️ 4D Construction Scene Loaded with LASBCA Staff!');
